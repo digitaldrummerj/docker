@@ -2,9 +2,11 @@ FROM digitaldrummerj/cordova
 
 MAINTAINER Justin James <digitaldrummerj@gmail.com>
 
-ENV IONIC_VERSION beta
+#ENV IONIC_VERSION beta
 
 # IONIC 
 WORKDIR "/tmp"
 
-RUN npm i -g --unsafe-perm ionic@${IONIC_VERSION}
+#RUN npm i -g --unsafe-perm ionic@${IONIC_VERSION}
+RUN npm -i -g --unsafe-perm ionic
+
