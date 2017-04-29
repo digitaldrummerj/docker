@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/bin/bash -e
+echo "Starting xvfb"
 
-Xvfb :99 -ac -screen 0 1280x720x16 -nolisten tcp &
+/etc/init.d/xvfb start && sleep 2
+
+# workaroud, see: https://github.com/karma-runner/karma-chrome-launcher/issues/34
+#pkill chrome # kill chrome everytime
+
+echo "Executing command $@"
 exec "$@"

@@ -1,0 +1,6 @@
+FROM node:6
+
+ENV HOME=/home/app
+WORKDIR $HOME
+RUN npm install -g gulp;npm cache clean
+EXPOSE 3027

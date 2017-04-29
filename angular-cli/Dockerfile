@@ -1,31 +1,34 @@
-FROM node:6-alpine
-
-LABEL authors="Justin <digitaldrummerj@gmail.com>"
-
-RUN apk update \
-  && apk add  xvfb chromium  \
-  && apk add --update alpine-sdk \
-  && npm install -g @angular/cli@1.0.0 \
-  && apk del alpine-sdk \
-  && rm -rf /tmp/* /var/cache/apk/* *.tar.gz ~/.npm \
-  && npm cache clear \
-  && sed -i -e "s/bin\/ash/bin\/sh/" /etc/passwd
-
-ADD xvfb-chromium /usr/bin/xvfb-chromium
-RUN ln -s /usr/bin/xvfb-chromium /usr/bin/google-chrome
-RUN ln -s /usr/bin/xvfb-chromium /usr/bin/chromium-browser
-
-# For tests
-ENV DISPLAY :99
-ENV CHROME_BIN /usr/bin/chromium-browser
+FROM node:6
+MAINTAINER "Justin <digitaldrummerj@gmail.com>"
 
 EXPOSE 4200
 EXPOSE 49153
+EXPOSE 9222
+EXPOSE 9876
 
 ENV HOME=/home/app
 WORKDIR $HOME
 
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod a+x /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+# https://www.google.com/linuxrepositories/
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list
+
+RUN apt-get update && apt-get install --no-install-recommends -y google-chrome-stable
+# Note that headless mode is only supported in Linux and you'll need a pretty recent Chrome version. Afaik Chromium from the Ubuntu PPAs doesn't support it yet for example.
+
+RUN npm install -g @angular/cli && npm cache clean && rm -rf ~/.npm
+
+# customLaunchers: {
+#       ChromeCanaryHeadless: {
+#         base: 'ChromeCanary',
+#         flags: [
+#           '--no-sandbox',
+#           // See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
+#           '--headless',
+#           '--disable-gpu',
+#           // Without a remote debugging port, Google Chrome exits immediately.
+#           ' --remote-debugging-port=9222',
+#         ]
+#       }
+#     },
